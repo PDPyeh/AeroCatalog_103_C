@@ -7,7 +7,7 @@ function Home() {
       {/* Hero Section */}
       <section className="container mx-auto px-4 py-20 text-center">
         <h1 className="text-5xl font-bold text-blue-600 mb-6">
-          Welcome to Aircraft Catalog
+          Welcome to AeroCatalog
         </h1>
         <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
           Explore a comprehensive catalog of commercial and military aircraft from Boeing and Airbus.
@@ -68,7 +68,7 @@ function Home() {
             Ready to Explore?
           </h2>
           <p className="text-xl mb-8 max-w-2xl mx-auto">
-            Start browsing our comprehensive aircraft catalog or log in as an admin to manage data.
+            Start browsing our comprehensive Aerocatalog or log in as an admin to manage data.
           </p>
           <div className="space-x-4">
             <Link
