@@ -1,6 +1,6 @@
 const express = require('express');
 const { Aircraft } = require('../models');
-const { apiKeyAuth } = require('../middleware/apiKeyAuth');
+const { apiKeyOrAdminAuth } = require('../middleware/apiKeyAuth');
 const { Op } = require('sequelize');
 const router = express.Router();
 
@@ -59,8 +59,8 @@ router.get('/:id', async (req, res, next) => {
   }
 });
 
-// Create aircraft (Admin with API Key)
-router.post('/', apiKeyAuth, async (req, res, next) => {
+// Create aircraft (Admin with JWT or API Key)
+router.post('/', apiKeyOrAdminAuth, async (req, res, next) => {
   try {
     const { manufacturerId, categoryId, modelName } = req.body;
 
@@ -79,8 +79,8 @@ router.post('/', apiKeyAuth, async (req, res, next) => {
   }
 });
 
-// Update aircraft (Admin with API Key)
-router.put('/:id', apiKeyAuth, async (req, res, next) => {
+// Update aircraft (Admin with JWT or API Key)
+router.put('/:id', apiKeyOrAdminAuth, async (req, res, next) => {
   try {
     let aircraft = await Aircraft.findByPk(req.params.id);
 
@@ -99,8 +99,8 @@ router.put('/:id', apiKeyAuth, async (req, res, next) => {
   }
 });
 
-// Delete aircraft (Admin with API Key)
-router.delete('/:id', apiKeyAuth, async (req, res, next) => {
+// Delete aircraft (Admin with JWT or API Key)
+router.delete('/:id', apiKeyOrAdminAuth, async (req, res, next) => {
   try {
     const aircraft = await Aircraft.findByPk(req.params.id);
 

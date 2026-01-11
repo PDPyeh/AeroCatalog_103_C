@@ -1,0 +1,137 @@
+@startuml 3-Tier Architecture - AeroCatalog
+
+skinparam {
+    BackgroundColor #f5f5f5
+    BorderColor #333
+    FontColor #333
+    FontSize 11
+    ArrowColor #555
+    componentBackgroundColor #e1f5ff
+    componentBorderColor #01579b
+    rectangleBackgroundColor #fff3e0
+    rectangleBorderColor #e65100
+}
+
+' TIER 1: PRESENTATION LAYER (Frontend)
+rectangle "TIER 1: PRESENTATION LAYER" #fff3e0 {
+    rectangle "User Interface (React SPA)" #fbe9e7 {
+        component [Home Page\nCarousel] as home
+        component [Login Page] as login
+        component [Register Page] as register
+        component [API Dashboard] as dashboard
+        component [API Tester] as tester
+        component [Admin Panel] as admin
+        
+        component [Navigation] as nav
+        component [State Mgmt\n(Zustand)] as zustand
+        component [HTTP Client\n(Axios)] as http
+        
+        home --> nav
+        login --> nav
+        register --> nav
+        dashboard --> nav
+        tester --> nav
+        admin --> nav
+        
+        nav --> zustand
+        zustand --> http
+    }
+}
+
+note right of http
+    Endpoints:
+    /api/users/register
+    /api/users/login
+    /api/api-keys/*
+    /api/aircraft
+end note
+
+' TIER 2: BUSINESS LOGIC LAYER
+rectangle "TIER 2: BUSINESS LOGIC LAYER" #e8f5e9 {
+    rectangle "API Gateway" #c8e6c9 {
+        component [Express.js\n(Port 5000)] as server
+    }
+    
+    rectangle "Middleware Stack" #a5d6a7 {
+        component [Parser] as parser
+        component [JWT Auth] as jwt
+        component [API Key Auth] as apikey
+        component [Error Handler] as handler
+        
+        parser --> jwt
+        jwt --> apikey
+        apikey --> handler
+    }
+    
+    rectangle "Route Handlers" #81c784 {
+        component [Admin Routes] as admin_r
+        component [User Routes] as user_r
+        component [Aircraft Routes] as aircraft_r
+        component [API Key Routes] as apikey_r
+    }
+    
+    rectangle "Business Logic" #66bb6a {
+        component [Admin Service] as admin_s
+        component [User Service] as user_s
+        component [Aircraft Service] as aircraft_s
+        component [API Key Service] as apikey_s
+        component [Auth Service] as auth_s
+        
+        admin_s --> auth_s
+        user_s --> auth_s
+        aircraft_s --> auth_s
+        apikey_s --> auth_s
+    }
+    
+    server --> parser
+    parser --> admin_r
+    parser --> user_r
+    parser --> aircraft_r
+    parser --> apikey_r
+    
+    admin_r --> admin_s
+    user_r --> user_s
+    aircraft_r --> aircraft_s
+    apikey_r --> apikey_s
+}
+
+' TIER 3: DATA LAYER
+rectangle "TIER 3: DATA LAYER" #f3e5f5 {
+    rectangle "ORM Layer" #e1bee7 {
+        component [Sequelize ORM] as sequelize
+    }
+    
+    rectangle "MySQL Database (Port 3309)" #ce93d8 {
+        component [admins] as admins_tbl
+        component [end_users] as users_tbl
+        component [api_keys] as apikeys_tbl
+        component [aircraft] as aircraft_tbl
+        component [manufacturers] as mfg_tbl
+        component [categories] as cat_tbl
+        component [chat_sessions] as chat_s_tbl
+        component [chat_messages] as chat_m_tbl
+        
+        aircraft_tbl --> mfg_tbl
+        aircraft_tbl --> cat_tbl
+        apikeys_tbl --> users_tbl
+        chat_s_tbl --> users_tbl
+        chat_m_tbl --> chat_s_tbl
+    }
+}
+
+' Cross-layer connections
+admin_s --> sequelize : Query
+user_s --> sequelize : Query
+aircraft_s --> sequelize : Query
+apikey_s --> sequelize : Query
+auth_s --> sequelize : Query
+
+http -.-> server : HTTP
+server -.-> http : Response
+
+legend right
+    Solid arrows (-->) = Request flow
+    Dotted arrows (-.->) = Response flow
+end legend
+
+@enduml

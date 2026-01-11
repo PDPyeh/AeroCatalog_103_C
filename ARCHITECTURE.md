@@ -250,15 +250,12 @@ GET /api/aircraft
 | Method | Endpoint | Auth | Purpose |
 |--------|----------|------|---------|
 | POST | `/login` | None | Admin login |
-| GET | `/me` | JWT | Get admin profile |
 
 ### User Routes (/api/users)
 | Method | Endpoint | Auth | Purpose |
 |--------|----------|------|---------|
 | POST | `/register` | None | Register new user |
 | POST | `/login` | None | User login |
-| GET | `/me` | JWT | Get user profile |
-| PUT | `/profile` | JWT | Update user profile |
 
 ### API Keys Routes (/api/api-keys)
 | Method | Endpoint | Auth | Purpose |

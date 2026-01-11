@@ -1,6 +1,6 @@
 const express = require('express');
 const { Category } = require('../models');
-const { apiKeyAuth } = require('../middleware/apiKeyAuth');
+const { apiKeyOrAdminAuth } = require('../middleware/apiKeyAuth');
 const router = express.Router();
 
 // Get all categories (public)
@@ -41,8 +41,8 @@ router.get('/:id', async (req, res, next) => {
   }
 });
 
-// Create category (Admin with API Key)
-router.post('/', apiKeyAuth, async (req, res, next) => {
+// Create category (Admin with JWT or API Key)
+router.post('/', apiKeyOrAdminAuth, async (req, res, next) => {
   try {
     const { name, description } = req.body;
 
@@ -61,8 +61,8 @@ router.post('/', apiKeyAuth, async (req, res, next) => {
   }
 });
 
-// Update category (Admin with API Key)
-router.put('/:id', apiKeyAuth, async (req, res, next) => {
+// Update category (Admin with JWT or API Key)
+router.put('/:id', apiKeyOrAdminAuth, async (req, res, next) => {
   try {
     let category = await Category.findByPk(req.params.id);
 
@@ -81,8 +81,8 @@ router.put('/:id', apiKeyAuth, async (req, res, next) => {
   }
 });
 
-// Delete category (Admin with API Key)
-router.delete('/:id', apiKeyAuth, async (req, res, next) => {
+// Delete category (Admin with JWT or API Key)
+router.delete('/:id', apiKeyOrAdminAuth, async (req, res, next) => {
   try {
     const category = await Category.findByPk(req.params.id);
 

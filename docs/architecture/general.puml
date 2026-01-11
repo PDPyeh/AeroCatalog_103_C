@@ -1,0 +1,91 @@
+@startuml General Architecture - AeroCatalog
+
+!define AWSPUML https://raw.githubusercontent.com/awslabs/aws-icons-for-plantuml/v14.0/dist
+!include AWSPUML/AmazonRDS/Database.puml
+!include AWSPUML/Compute/ApplicationAutoScaling.puml
+
+skinparam {
+    BackgroundColor #f5f5f5
+    BorderColor #333
+    FontColor #333
+    FontSize 12
+    ArrowColor #555
+    componentBackgroundColor #e1f5ff
+    componentBorderColor #01579b
+}
+
+' Define layers
+rectangle "Client Layer" #e3f2fd {
+    component [Web Browser\n(React SPA)] as browser
+    note right of browser
+        • Home page with carousel
+        • User login/register
+        • API dashboard
+        • API tester
+        • Admin panel
+    end note
+}
+
+rectangle "Presentation Layer (Frontend)" #bbdefb {
+    component [React 18.2] as react
+    component [React Router] as router
+    component [Zustand Store] as store
+    component [Axios HTTP Client] as axios
+    
+    react --> router
+    react --> store
+    react --> axios
+}
+
+rectangle "Network & API Gateway" #90caf9 {
+    component [HTTP/REST\n(Port 5000)] as gateway
+    note right of gateway
+        • CORS enabled
+        • JWT verification
+        • API key validation
+    end note
+}
+
+rectangle "Business Logic Layer (Backend)" #64b5f6 {
+    component [Express.js\nRouter] as express
+    component [Middleware\n(Auth, Error Handler)] as middleware
+    component [Service Layer\n(Business Logic)] as service
+    component [Sequelize ORM] as orm
+    
+    express --> middleware
+    middleware --> service
+    service --> orm
+}
+
+rectangle "Data Persistence Layer" #42a5f5 {
+    component [Sequelize Models\n(ORM Layer)] as models
+    component [MySQL Database\n(Port 3309)] as db
+    
+    models --> db
+    note right of db
+        • admins table
+        • end_users table
+        • aircraft table
+        • api_keys table
+        • manufacturers table
+        • categories table
+        • chat_sessions table
+        • chat_messages table
+    end note
+}
+
+' Connections
+browser --> react : Renders
+axios --> gateway : API Requests
+gateway --> express : Routes requests
+orm --> models : Query builder
+models --> db : SQL queries
+
+' Response flow
+db -.-> models : Returns data
+models -.-> orm : ORM mapping
+express -.-> gateway : Response
+axios -.-> react : Updates state
+react -.-> browser : Re-render
+
+@enduml

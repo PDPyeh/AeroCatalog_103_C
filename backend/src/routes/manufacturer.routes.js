@@ -1,6 +1,6 @@
 const express = require('express');
 const { Manufacturer } = require('../models');
-const { apiKeyAuth } = require('../middleware/apiKeyAuth');
+const { apiKeyOrAdminAuth } = require('../middleware/apiKeyAuth');
 const router = express.Router();
 
 // Get all manufacturers (public)
@@ -41,8 +41,8 @@ router.get('/:id', async (req, res, next) => {
   }
 });
 
-// Create manufacturer (Admin with API Key)
-router.post('/', apiKeyAuth, async (req, res, next) => {
+// Create manufacturer (Admin with JWT or API Key)
+router.post('/', apiKeyOrAdminAuth, async (req, res, next) => {
   try {
     const { name, country, description, image } = req.body;
 
@@ -66,8 +66,8 @@ router.post('/', apiKeyAuth, async (req, res, next) => {
   }
 });
 
-// Update manufacturer (Admin with API Key)
-router.put('/:id', apiKeyAuth, async (req, res, next) => {
+// Update manufacturer (Admin with JWT or API Key)
+router.put('/:id', apiKeyOrAdminAuth, async (req, res, next) => {
   try {
     let manufacturer = await Manufacturer.findByPk(req.params.id);
 
@@ -86,8 +86,8 @@ router.put('/:id', apiKeyAuth, async (req, res, next) => {
   }
 });
 
-// Delete manufacturer (Admin with API Key)
-router.delete('/:id', apiKeyAuth, async (req, res, next) => {
+// Delete manufacturer (Admin with JWT or API Key)
+router.delete('/:id', apiKeyOrAdminAuth, async (req, res, next) => {
   try {
     const manufacturer = await Manufacturer.findByPk(req.params.id);
 

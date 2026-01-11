@@ -1,0 +1,168 @@
+@startuml 3-Tier Architecture - AeroCatalog
+
+skinparam {
+    BackgroundColor #f5f5f5
+    BorderColor #333
+    FontColor #333
+    FontSize 11
+    ArrowColor #555
+    componentBackgroundColor #e1f5ff
+    componentBorderColor #01579b
+    rectangleBackgroundColor #fff3e0
+    rectangleBorderColor #e65100
+}
+
+' ============================================
+' TIER 1: PRESENTATION LAYER (Frontend)
+' ============================================
+rectangle "TIER 1: PRESENTATION LAYER" #fff3e0 {
+    rectangle "User Interface (React SPA)" #fbe9e7 {
+        component [Home Page\n✈️ Carousel] as home
+        component [Login Page] as login
+        component [Register Page] as register
+        component [API Dashboard] as dashboard
+        component [API Tester] as tester
+        component [Admin Panel] as admin
+        
+        component [Navigation\n(Navbar, Router)] as nav
+        component [State Management\n(Zustand)] as zustand
+        component [HTTP Client\n(Axios)] as http
+        
+        home --> nav
+        login --> nav
+        register --> nav
+        dashboard --> nav
+        tester --> nav
+        admin --> nav
+        
+        nav --> zustand
+        zustand --> http
+    }
+    
+    note right of http
+        Endpoints:
+        • /api/users/register
+        • /api/users/login
+        • /api/api-keys/*
+        • /api/aircraft
+    end note
+    
+    note right of server
+        CORS enabled
+        Request routing
+    end note
+}
+    
+    rectangle "Middleware Stack" #a5d6a7 {
+        component [Request Parser\n(JSON, URL-encoded)] as parser
+        component [JWT Verifier\n(Auth tokens)] as jwt
+        component [API Key Verifier\n(User access)] as apikey
+        component [Error Handler\n(Global)] as errorhandler
+        
+        parser --> jwt
+        jwt --> apikey
+        apikey --> errorhandler
+    }
+    
+rectangle "Route Handlers" #81c784 {
+    component [Admin Routes] as admin_routes
+    component [User Routes] as user_routes
+    component [Aircraft Routes] as aircraft_routes
+    component [API Key Routes] as apikey_routes
+    component [Manufacturer Routes] as mfg_routes
+    component [Category Routes] as cat_routes
+}
+
+rectangle "Business Logic" #66bb6a {
+    component [Admin Service] as admin_service
+    component [User Service] as user_service
+    component [Aircraft Service] as aircraft_service
+    component [API Key Service] as apikey_service
+    component [Auth Service] as auth_service
+    
+    admin_service --> auth_service
+    user_service --> auth_service
+    aircraft_service --> auth_service
+    apikey_service --> auth_service
+}
+    parser --> admin_routes
+    parser --> user_routes
+    parser --> aircraft_routes
+    parser --> apikey_routes
+    parser --> mfg_routes
+    parser --> cat_routes
+    
+    admin_routes --> admin_service
+    user_routes --> user_service
+    aircraft_routes --> aircraft_service
+    apikey_routes --> apikey_service
+}
+
+note right of aircraft_routes
+    GET /aircraft
+    GET /aircraft/:id
+    (requires API key)
+end note
+}
+
+' ============================================
+' TIER 3: DATA LAYER (Database)
+' ============================================
+rectangle "TIER 3: DATA LAYER" #f3e5f5 {
+    rectangle "ORM Layer" #e1bee7 {
+        component [Sequelize ORM] as sequelize
+    }
+    
+    rectangle "MySQL Database\n(Port 3309)" #ce93d8 {
+        component [admins table] as admins_tbl
+        component [end_users table] as users_tbl
+        component [api_keys table] as apikeys_tbl
+        component [aircraft table] as aircraft_tbl
+        component [manufacturers table] as mfg_tbl
+        component [categories table] as cat_tbl
+        component [chat_sessions table] as chat_s_tbl
+        component [chat_messages table] as chat_m_tbl
+        
+        aircraft_tbl --> mfg_tbl : FK manufacturerId
+        aircraft_tbl --> cat_tbl : FK categoryId
+        apikeys_tbl --> users_tbl : FK userId
+        chat_s_tbl --> users_tbl : FK userId
+        chat_m_tbl --> chat_s_tbl : FK sessionId
+    }
+    
+    sequelize --> admins_tbl
+    sequelize --> users_tbl
+    sequelize --> apikeys_tbl
+    sequelize --> aircraft_tbl
+    sequelize --> mfg_tbl
+    sequelize --> cat_tbl
+    sequelize --> chat_s_tbl
+    sequelize --> chat_m_tbl
+}
+
+' ============================================
+' CROSS-LAYER CONNECTIONS
+' ============================================
+
+admin_service --> sequelize : Query
+user_service --> sequelize : Query
+aircraft_service --> sequelize : Query
+apikey_service --> sequelize : Query
+auth_service --> sequelize : Query/Auth
+
+http -.-> server : HTTP requests
+server -.-> http : HTTP responses
+
+' ============================================
+' LEGEND
+' ============================================
+rectangle "Legend" {
+    note
+        Solid arrows (-->) = Request flow
+        Dotted arrows (-.->) = Response flow
+        FK = Foreign Key
+        PK = Primary Key
+    end note
+}
+
+@enduml
