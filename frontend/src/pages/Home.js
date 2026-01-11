@@ -1,42 +1,100 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { FiArrowRight, FiCode, FiBook, FiZap } from 'react-icons/fi';
 
 function Home() {
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  // Array of aircraft images - using placeholder URLs
+  const slides = [
+    'https://images.unsplash.com/photo-1446776653964-20c1d3a81b06?w=1200&h=600&fit=crop',
+    'https://images.unsplash.com/photo-1464207687429-7505649dae38?w=1200&h=600&fit=crop',
+    'https://images.unsplash.com/photo-1540962351516-3b6c3f29a11c?w=1200&h=600&fit=crop',
+    'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&h=600&fit=crop',
+    'https://images.unsplash.com/photo-1489749798305-4fea3ba63d60?w=1200&h=600&fit=crop',
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 5000); // Ganti slide setiap 5 detik
+
+    return () => clearInterval(interval);
+  }, [slides.length]);
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
-      {/* Hero Section */}
-      <section className="container mx-auto px-4 py-20 text-center">
-        <div className="mb-8">
-          <h1 className="text-6xl font-bold text-gray-900 mb-4">
-            ✈️ AeroCatalog API
-          </h1>
-          <p className="text-2xl text-gray-700 mb-6">
-            Database Pesawat Komersial Terlengkap Indonesia
-          </p>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Integrasi database pesawat ke aplikasi Anda dengan mudah. 
-            API sederhana, dokumentasi lengkap, dan dukungan penuh untuk developers.
-          </p>
+    <div>
+      {/* Hero Section with Carousel */}
+      <section className="relative h-screen overflow-hidden">
+        {/* Background Carousel */}
+        <div className="absolute inset-0">
+          {slides.map((slide, index) => (
+            <div
+              key={index}
+              className={`absolute inset-0 transition-opacity duration-1000 ${
+                index === currentSlide ? 'opacity-100' : 'opacity-0'
+              }`}
+              style={{
+                backgroundImage: `url(${slide})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+              }}
+            >
+              {/* Dark overlay for text visibility */}
+              <div className="absolute inset-0 bg-black/40"></div>
+            </div>
+          ))}
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-          <Link
-            to="/register"
-            className="bg-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center justify-center gap-2 text-lg"
-          >
-            <FiArrowRight /> 🎉 Ayo Daftar Sekarang!
-          </Link>
-          <Link
-            to="/help"
-            className="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold border-2 border-blue-600 hover:bg-blue-50 transition flex items-center justify-center gap-2 text-lg"
-          >
-            <FiBook /> Pelajari API
-          </Link>
+        {/* Carousel Controls */}
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+          {slides.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => setCurrentSlide(index)}
+              className={`w-3 h-3 rounded-full transition-all ${
+                index === currentSlide
+                  ? 'bg-white w-8'
+                  : 'bg-white/50 hover:bg-white/75'
+              }`}
+              aria-label={`Go to slide ${index + 1}`}
+            />
+          ))}
+        </div>
+
+        {/* Hero Content */}
+        <div className="relative h-full flex items-center justify-center px-4">
+          <div className="text-center text-white">
+            <h1 className="text-6xl font-bold mb-4 drop-shadow-lg">
+              AeroCatalog API
+            </h1>
+            <p className="text-2xl mb-6 drop-shadow-lg">
+              Database Pesawat Komersial Terlengkap Indonesia
+            </p>
+            <p className="text-lg max-w-2xl mx-auto mb-8 drop-shadow-lg">
+              Integrasi database pesawat ke aplikasi Anda dengan mudah. 
+              API sederhana, dokumentasi lengkap, dan dukungan penuh untuk developers.
+            </p>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Link
+                to="/register"
+                className="bg-blue-600 text-white px-8 py-4 rounded-lg font-semibold hover:bg-blue-700 transition flex items-center justify-center gap-2 text-lg"
+              >
+                <FiArrowRight /> 🎉 Ayo Daftar Sekarang!
+              </Link>
+              <Link
+                to="/help"
+                className="bg-white text-blue-600 px-8 py-4 rounded-lg font-semibold hover:bg-blue-50 transition flex items-center justify-center gap-2 text-lg"
+              >
+                <FiBook /> Pelajari API
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Features Section - White Background */}
       <section className="bg-white py-20">
         <div className="container mx-auto px-4">
           <h2 className="text-4xl font-bold text-center text-gray-900 mb-16">
