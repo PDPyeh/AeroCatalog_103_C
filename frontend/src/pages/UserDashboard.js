@@ -21,7 +21,7 @@ function UserDashboard() {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.get(
-        `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/api-keys`,
+        `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api-keys`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -40,7 +40,7 @@ function UserDashboard() {
       setLoading(true);
       const token = localStorage.getItem('token');
       await axios.post(
-        `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/api-keys`,
+        `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api-keys/generate`,
         {},
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -65,7 +65,7 @@ function UserDashboard() {
     try {
       const token = localStorage.getItem('token');
       await axios.delete(
-        `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api/api-keys/${id}`,
+        `${process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api-keys/${id}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -247,7 +247,7 @@ function UserDashboard() {
                 <div>
                   <p className="font-medium text-gray-800 mb-2">Base URL:</p>
                   <code className="bg-gray-100 px-2 py-1 rounded block">
-                    {process.env.REACT_APP_API_URL || 'http://localhost:5000'}/api
+                    {process.env.REACT_APP_API_URL || 'http://localhost:5000'}
                   </code>
                 </div>
                 <div>

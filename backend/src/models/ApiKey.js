@@ -12,7 +12,7 @@ const ApiKey = sequelize.define('ApiKey', {
     type: DataTypes.INTEGER,
     allowNull: false,
     references: {
-      model: 'users',
+      model: 'end_users',
       key: 'id',
     },
   },
