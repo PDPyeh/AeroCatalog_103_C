@@ -1,43 +1,101 @@
-# Aircraft Catalog Application
+# AeroCatalog - API-as-a-Service Platform
 
-Aplikasi katalog pesawat Boeing dan Airbus dengan fitur:
-- **Public**: Browse katalog pesawat tanpa login
-- **Admin**: Generate API key untuk CRUD operations
-- **Database**: MySQL dengan Sequelize ORM
+Platform **API-as-a-Service** yang menyediakan database pesawat komersial untuk developer. Integrasi mudah, dokumentasi lengkap, dan live API testing langsung dari dashboard.
 
-## Architecture
+## 🎯 Project Overview
+
+AeroCatalog adalah platform yang memisahkan dua role utama:
+
+- **👥 End Users (Developers):** Mendaftar, generate API key, dan akses database pesawat via REST API
+- **🔐 Admins:** Mengelola platform dan data
+
+### Key Features
+
+✨ **Untuk End Users:**
+- Pendaftaran & login gratis
+- Generate hingga 10 API keys
+- Dashboard API key management
+- Live API testing di browser
+- Comprehensive API documentation
+- Code examples (JavaScript, Python, cURL)
+
+🛠️ **Data:**
+- 63+ pesawat komersial
+- 5 manufacturers (Boeing, Airbus, etc.)
+- 6 kategori pesawat
+- Spesifikasi lengkap (kapasitas, kecepatan, jangkauan)
+
+---
+
+## 🏗️ Tech Stack
+
+### Backend
+- **Runtime:** Node.js
+- **Framework:** Express.js
+- **Database:** MySQL (port 3309)
+- **ORM:** Sequelize
+- **Auth:** JWT + API Keys
+
+### Frontend
+- **Framework:** React 18.2
+- **Styling:** Tailwind CSS
+- **Routing:** React Router v6
+- **State:** Zustand
+- **HTTP:** Axios
+
+---
+
+## 📁 Project Structure
 
 ```
 AeroCatalog_103/
-├── backend/              # Node.js + Express API
+├── backend/
 │   ├── src/
-│   │   ├── models/       # Sequelize models
-│   │   ├── routes/       # API routes
-│   │   ├── middleware/   # Auth & error handling
-│   │   ├── config/       # Database config
-│   │   └── server.js     # Entry point
-│   ├── package.json
-│   └── .env.example
+│   │   ├── models/           # Sequelize models
+│   │   ├── routes/           # API endpoints
+│   │   ├── middleware/       # Auth & error handling
+│   │   ├── config/           # Database config
+│   │   └── server.js         # Express entry point
+│   ├── migrate-admins.js     # Seed admin accounts
+│   ├── fix-apikeys.js        # Fix FK constraints
+│   ├── .env
+│   └── package.json
 │
-└── frontend/             # React + Tailwind UI
-    ├── src/
-    │   ├── pages/        # Page components
-    │   ├── components/   # Reusable components
-    │   ├── api/          # API client
-    │   ├── store/        # Zustand stores
-    │   └── App.js
-    ├── package.json
-    └── README.md
+├── frontend/
+│   ├── src/
+│   │   ├── pages/
+│   │   │   ├── Home.js                 # Landing page (carousel)
+│   │   │   ├── Help.js                 # Docs + API tester
+│   │   │   ├── Register.js             # User signup
+│   │   │   ├── UserLogin.js            # User login
+│   │   │   ├── UserDashboard.js        # API key management
+│   │   │   ├── AdminLogin.js           # Admin login
+│   │   │   └── AdminDashboard.js       # Admin panel
+│   │   ├── components/
+│   │   │   ├── Navbar.js
+│   │   │   └── Footer.js
+│   │   ├── store/
+│   │   │   └── authStore.js            # Zustand auth state
+│   │   ├── api/
+│   │   │   └── client.js               # Axios instance
+│   │   └── App.js                      # Router
+│   ├── .env
+│   └── package.json
+│
+├── ARCHITECTURE.md      # Detailed architecture docs
+└── README.md           # This file
 ```
 
-## Quick Start
+---
+
+## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 14+
-- MySQL 5.7+
-- npm atau yarn
+- **Node.js** v18+
+- **MySQL** 5.7+ (running on port 3309)
+- **npm**
 
-### 1. Backend Setup
+### Step 1: Backend Setup
 
 ```bash
 cd backend
@@ -45,26 +103,23 @@ cd backend
 # Install dependencies
 npm install
 
-# Setup .env file
-cp .env.example .env
-# Edit .env dan konfigurasi:
+# Configure .env (already provided)
 # DB_HOST=localhost
-# DB_PORT=3306
+# DB_PORT=3309
 # DB_NAME=aerocatalog
 # DB_USER=root
-# DB_PASSWORD=
+# DB_PASSWORD=Meraklangka1
 
-# Create database
-mysql -u root -p
-CREATE DATABASE aerocatalog;
+# Seed admin accounts
+node migrate-admins.js
 
-# Run server
-npm run dev
+# Start backend
+npm start
 ```
 
-Server running di `http://localhost:5000`
+✅ Backend running at `http://localhost:5000`
 
-### 2. Frontend Setup
+### Step 2: Frontend Setup
 
 ```bash
 cd frontend
@@ -72,176 +127,371 @@ cd frontend
 # Install dependencies
 npm install
 
-# Start development server
+# Start dev server (will open browser automatically)
 npm start
 ```
 
-App akan buka di `http://localhost:3000`
-
-## API Key Flow
-
-1. **Admin Login**
-   - POST `/api/auth/register` atau `/api/auth/login`
-   - Dapatkan JWT token
-
-2. **Generate API Key**
-   - POST `/api/admin/api-keys/generate` dengan JWT token
-   - Dapatkan API key (simpan, tidak bisa dilihat lagi!)
-
-3. **Use API Key untuk CRUD**
-   - Kirim API key di header `X-API-Key`
-   - Contoh:
-   ```bash
-   curl -X POST http://localhost:5000/api/aircraft \
-     -H "X-API-Key: aircraft_xxxxx" \
-     -H "Content-Type: application/json" \
-     -d '{
-       "manufacturerId": 1,
-       "categoryId": 1,
-       "modelName": "Boeing 737",
-       ...
-     }'
-   ```
-
-## Database Schema
-
-### Users
-- Admin accounts untuk manage data
-
-### ApiKeys
-- API keys untuk CRUD dengan expiry & tracking
-
-### Manufacturers
-- Boeing, Airbus, dll.
-
-### Categories
-- Narrow-body, Wide-body, Regional, Cargo, Military
-
-### Aircraft
-- Semua pesawat dengan spesifikasi lengkap
-
-Relasi:
-- Manufacturer → Aircraft (1:many)
-- Category → Aircraft (1:many)
-- User → ApiKey (1:many)
-
-## Available Routes
-
-### Public Routes (No Auth)
-- `GET /api/aircraft` - List aircraft dengan filter
-- `GET /api/aircraft/:id` - Detail pesawat
-- `GET /api/manufacturers` - List manufacturers
-- `GET /api/categories` - List categories
-
-### Admin Routes (JWT Token)
-- `POST /api/auth/register` - Register admin
-- `POST /api/auth/login` - Login admin
-- `POST /api/admin/api-keys/generate` - Generate API key
-- `GET /api/admin/api-keys` - List API keys
-- `DELETE /api/admin/api-keys/:id` - Revoke API key
-
-### CRUD Routes (API Key Required)
-- `POST /api/aircraft` - Create aircraft
-- `PUT /api/aircraft/:id` - Update aircraft
-- `DELETE /api/aircraft/:id` - Delete aircraft
-- `POST /api/manufacturers` - Create manufacturer
-- `PUT /api/manufacturers/:id` - Update manufacturer
-- `DELETE /api/manufacturers/:id` - Delete manufacturer
-- `POST /api/categories` - Create category
-- `PUT /api/categories/:id` - Update category
-- `DELETE /api/categories/:id` - Delete category
-
-## Demo Admin Account
-
-```
-Email: admin@example.com
-Password: password123
-```
-
-(Ganti dengan credensial di database setelah setup)
-
-## Tech Stack
-
-### Backend
-- Node.js + Express.js
-- Sequelize ORM
-- MySQL
-- JWT + API Keys
-- bcryptjs untuk password hashing
-
-### Frontend
-- React 18
-- React Router v6
-- Axios
-- Zustand
-- Tailwind CSS
-- React Icons
-
-## Features
-
-✅ **Public**
-- Browse aircraft catalog
-- Search & filter aircraft
-- View aircraft specifications
-
-✅ **Admin**
-- User registration & login
-- API key generation & management
-- CRUD aircraft
-- CRUD manufacturers
-- CRUD categories
-
-## Project Structure Notes
-
-- **Backend**: REST API dengan Sequelize models
-- **Frontend**: React SPA dengan client-side routing
-- **Database**: Normalized relational schema
-- **Auth**: JWT untuk admin, API Keys untuk CRUD
-
-## File Highlights
-
-**Backend Key Files:**
-- `src/server.js` - Express app setup
-- `src/models/` - Sequelize models
-- `src/routes/` - API endpoints
-- `src/middleware/` - Auth & error handling
-
-**Frontend Key Files:**
-- `src/App.js` - Router setup
-- `src/pages/` - Page components
-- `src/api/client.js` - API client
-- `src/store/authStore.js` - Auth state
-
-## Troubleshooting
-
-**Database Connection Error**
-- Check MySQL running
-- Verify credentials di `.env`
-- Buat database: `CREATE DATABASE aerocatalog;`
-
-**CORS Error**
-- Backend CORS di `src/server.js` harus allow frontend origin
-- Development: `http://localhost:3000`
-
-**API Key Not Working**
-- Pastikan key active di database
-- Check header: `X-API-Key: <key>`
-- Verify key exists di `api_keys` table
-
-## Next Steps
-
-1. Install & run backend
-2. Create demo admin account
-3. Generate API key via dashboard
-4. Test CRUD dengan API key
-5. Customize data sesuai kebutuhan
-
-## Support
-
-Refer ke:
-- `backend/README.md` untuk API documentation
-- `frontend/README.md` untuk frontend setup details
+✅ Frontend running at `http://localhost:6767` or `http://localhost:6768`
 
 ---
 
-**Happy Coding! ✈️**
+## 📱 User Flows
+
+### Flow 1: End User Registration & API Testing
+
+```
+1. Visit http://localhost:6767 (Home page)
+2. Click "🎉 Ayo Daftar Sekarang!"
+3. Fill registration form (name, email, password, company, website)
+4. Auto-login → UserDashboard
+5. Click "Generate API Key"
+6. Copy the key (save it somewhere safe!)
+7. Go to Help & Docs page
+8. Switch to "Test API" tab
+9. Paste API key and test endpoints live
+```
+
+### Flow 2: Admin Login
+
+```
+1. Visit http://localhost:6767/admin/login
+2. Enter credentials:
+   - Email: admin@aerocatalog.com
+   - Password: admin123
+3. Access admin dashboard
+```
+
+### Flow 3: Using API with Generated Key
+
+```bash
+# Get all aircraft
+curl -X GET http://localhost:5000/api/aircraft \
+  -H "x-api-key: aircraft_xxxxx"
+
+# Get specific aircraft
+curl -X GET http://localhost:5000/api/aircraft/1 \
+  -H "x-api-key: aircraft_xxxxx"
+```
+
+---
+
+## 🔑 Authentication
+
+### End User Authentication (JWT)
+```
+POST /api/users/register
+POST /api/users/login
+Response: { token, user }
+```
+
+### Admin Authentication (JWT)
+```
+POST /api/admin/auth/login
+Response: { token, admin }
+```
+
+### API Key Authentication
+```
+Header: x-api-key: aircraft_xxxxx
+Used for: /api/aircraft, /api/manufacturers, /api/categories
+```
+
+---
+
+## 📡 API Endpoints
+
+### Aircraft (Public with API Key)
+```
+GET  /api/aircraft          # List all aircraft
+GET  /api/aircraft/:id      # Get specific aircraft
+```
+
+### Manufacturers (Public)
+```
+GET  /api/manufacturers     # List all manufacturers
+GET  /api/manufacturers/:id # Get specific manufacturer
+```
+
+### Categories (Public)
+```
+GET  /api/categories        # List all categories
+GET  /api/categories/:id    # Get specific category
+```
+
+### API Keys (Authenticated Users Only)
+```
+POST   /api/api-keys/generate  # Generate new key (max 10)
+GET    /api/api-keys           # List user's keys
+DELETE /api/api-keys/:keyId    # Revoke key
+```
+
+### Admin Auth
+```
+POST /api/admin/auth/login  # Admin login
+GET  /api/admin/auth/me     # Get admin profile
+```
+
+### User Auth
+```
+POST /api/users/register    # Register new user
+POST /api/users/login       # Login user
+GET  /api/users/me          # Get user profile
+PUT  /api/users/profile     # Update profile
+```
+
+---
+
+## 💾 Database
+
+### Tables
+- **admins** - Admin user accounts
+- **end_users** - End user developer accounts
+- **aircraft** - 63+ aircraft data
+- **manufacturers** - 5 manufacturers
+- **categories** - 6 aircraft categories
+- **api_keys** - User API keys (max 10 per user)
+- **chat_sessions** - Chatbot history
+- **chat_messages** - Chat messages
+
+### Relationships
+```
+end_users (1) ──── (N) api_keys
+            (1) ──── (N) chat_sessions
+
+aircraft (N) ──── (1) manufacturers
+          (N) ──── (1) categories
+
+chat_sessions (1) ──── (N) chat_messages
+```
+
+---
+
+## 📚 Features Breakdown
+
+### Home Page
+- **Carousel:** 5 rotating aircraft images (auto-refresh every 5 seconds)
+- **Hero Section:** Full-screen interactive landing
+- **Features:** Why choose AeroCatalog section
+- **CTAs:** Multiple calls-to-action for user acquisition
+
+### Help & Documentation Page
+- **Docs Tab:**
+  - Getting Started guide
+  - API Endpoints reference
+  - Authentication explanation
+  - Response format
+  - Code examples (JS, Python, cURL)
+  
+- **Test API Tab:**
+  - Live API tester
+  - API key input
+  - Endpoint selector
+  - Real-time response display
+  - Copy to clipboard
+
+### User Dashboard
+- Manage API keys
+- View key creation date & last used
+- Generate new keys
+- Delete/revoke keys
+- Account information display
+
+### Admin Dashboard
+- User management
+- Platform analytics
+- Data management
+
+---
+
+## 🔧 Troubleshooting
+
+### Backend Won't Start
+```bash
+# Check if port 5000 is already in use
+netstat -ano | findstr :5000
+
+# If occupied, kill the process
+taskkill /PID <PID> /F
+
+# Try again
+cd backend && npm start
+```
+
+### Database Connection Error
+```bash
+# Verify MySQL is running
+# Check credentials in backend/.env
+# Ensure database exists
+```
+
+### Frontend CORS Issues
+- Backend CORS is already configured for localhost:3000
+- If testing on different port, update `.env`
+
+### API Key Not Working
+- Ensure key is active in database
+- Check `x-api-key` header is set correctly
+- Generate new key and try again
+
+---
+
+## 📖 Documentation
+
+For detailed architecture and technical docs, see [ARCHITECTURE.md](ARCHITECTURE.md)
+
+---
+
+## 🗄️ Database Reset/Maintenance
+
+```bash
+# Reset API keys table
+node backend/cleanup-apikeys.js
+
+# Fix foreign key constraints
+node backend/fix-apikeys.js
+
+# Reseed admin accounts
+node backend/migrate-admins.js
+
+# Generate new admin account SQL
+node backend/generate-admin-query.js
+```
+
+---
+
+## 🌐 Environment Variables
+
+### Backend (.env)
+```env
+NODE_ENV=development
+PORT=5000
+
+DB_HOST=localhost
+DB_PORT=3309
+DB_NAME=aerocatalog
+DB_USER=root
+DB_PASSWORD=Meraklangka1
+
+JWT_SECRET=reallysecretkey
+JWT_EXPIRE=7d
+
+CORS_ORIGIN=http://localhost:3000
+```
+
+### Frontend (.env)
+```env
+REACT_APP_API_URL=http://localhost:5000/api
+PORT=6767
+DANGEROUSLY_DISABLE_HOST_CHECK=true
+```
+
+---
+
+## 👤 Default Credentials
+
+**Admin Account:**
+```
+Email:    admin@aerocatalog.com
+Password: admin123
+```
+
+(Generated by `migrate-admins.js`)
+
+---
+
+## 📊 API Response Format
+
+### Success Response
+```json
+{
+  "success": true,
+  "data": [ /* data here */ ],
+  "message": "Operation successful"
+}
+```
+
+### Error Response
+```json
+{
+  "success": false,
+  "message": "Error description here",
+  "status": 400
+}
+```
+
+---
+
+## 🎓 Code Examples
+
+### JavaScript/React
+```javascript
+const apiKey = 'aircraft_xxxxx';
+
+// Get all aircraft
+fetch('http://localhost:5000/api/aircraft', {
+  headers: { 'x-api-key': apiKey }
+})
+.then(res => res.json())
+.then(data => console.log(data.data));
+```
+
+### Python
+```python
+import requests
+
+api_key = 'aircraft_xxxxx'
+headers = {'x-api-key': api_key}
+
+response = requests.get(
+  'http://localhost:5000/api/aircraft',
+  headers=headers
+)
+
+aircraft = response.json()['data']
+print(aircraft)
+```
+
+### cURL
+```bash
+curl -X GET http://localhost:5000/api/aircraft \
+  -H "x-api-key: aircraft_xxxxx"
+```
+
+---
+
+## 🚦 Status
+
+| Component | Status | Port |
+|-----------|--------|------|
+| Backend API | ✅ Running | 5000 |
+| Frontend | ✅ Running | 6767/6768 |
+| Database | ✅ MySQL | 3309 |
+| Auth System | ✅ JWT + API Keys | - |
+
+---
+
+## 🤝 Contributing
+
+This is a learning project. Feel free to extend and improve!
+
+Suggested enhancements:
+- [ ] Rate limiting
+- [ ] Usage analytics
+- [ ] Email verification
+- [ ] OAuth integration
+- [ ] Webhook support
+- [ ] Mobile app
+- [ ] GraphQL API
+
+---
+
+## 📝 License
+
+MIT
+
+---
+
+**Built with ❤️ using Node.js + React**
+
+**Last Updated:** January 11, 2026
+
