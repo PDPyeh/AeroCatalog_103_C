@@ -1,7 +1,7 @@
 {
   "name": "aircraft-catalog-frontend",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "proxy": "http://localhost:5000",
   "dependencies": {
     "react": "^18.2.0",
@@ -39,5 +39,10 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "description": "Frontend React untuk aplikasi katalog pesawat Boeing dan Airbus.",
+  "main": "postcss.config.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
 }

@@ -3,6 +3,13 @@ const { User } = require('../models');
 const jwt = require('jsonwebtoken');
 const router = express.Router();
 
+// Generate JWT Token
+const generateToken = (id) => {
+  return jwt.sign({ id, type: 'user' }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRE,
+  });
+};
+
 // Middleware untuk verify JWT token
 const verifyToken = (req, res, next) => {
   try {
@@ -20,8 +27,87 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-// Get current admin profile
-router.get('/profile/me', verifyToken, async (req, res, next) => {
+// Register User
+router.post('/register', async (req, res, next) => {
+  try {
+    const { name, email, password, company, website } = req.body;
+
+    // Validation
+    if (!name || !email || !password) {
+      return res.status(400).json({ message: 'Please provide name, email and password' });
+    }
+
+    let user = await User.findOne({ where: { email } });
+    if (user) {
+      return res.status(400).json({ message: 'User already exists with this email' });
+    }
+
+    user = await User.create({
+      name,
+      email,
+      password,
+      company,
+      website,
+    });
+
+    const token = generateToken(user.id);
+
+    res.status(201).json({
+      success: true,
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        company: user.company,
+        website: user.website,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Login User
+router.post('/login', async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+
+    // Validation
+    if (!email || !password) {
+      return res.status(400).json({ message: 'Please provide email and password' });
+    }
+
+    const user = await User.findOne({ where: { email } });
+    if (!user) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    const isMatch = await user.matchPassword(password);
+    if (!isMatch) {
+      return res.status(401).json({ message: 'Invalid credentials' });
+    }
+
+    const token = generateToken(user.id);
+
+    res.status(200).json({
+      success: true,
+      token,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        company: user.company,
+        website: user.website,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+// Get current user profile
+router.get('/me', verifyToken, async (req, res, next) => {
   try {
     const user = await User.findByPk(req.user.id, {
       attributes: { exclude: ['password'] },
@@ -34,32 +120,34 @@ router.get('/profile/me', verifyToken, async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      data: user,
+      user,
     });
   } catch (error) {
     next(error);
   }
 });
 
-// Update admin profile
-router.put('/:id', verifyToken, async (req, res, next) => {
+// Update user profile
+router.put('/profile', verifyToken, async (req, res, next) => {
   try {
-    if (req.user.id !== parseInt(req.params.id)) {
-      return res.status(403).json({ message: 'Not authorized to update this profile' });
-    }
-
-    const user = await User.findByPk(req.params.id);
+    const user = await User.findByPk(req.user.id);
 
     if (!user) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Only allow updating name
-    await user.update({ name: req.body.name });
+    const { name, company, website } = req.body;
+    await user.update({ name, company, website });
 
     res.status(200).json({
       success: true,
-      data: user,
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        company: user.company,
+        website: user.website,
+      },
     });
   } catch (error) {
     next(error);
@@ -67,4 +155,5 @@ router.put('/:id', verifyToken, async (req, res, next) => {
 });
 
 module.exports = router;
+
 

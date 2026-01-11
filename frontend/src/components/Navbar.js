@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import { FiMenu, FiX } from 'react-icons/fi';
@@ -16,20 +16,26 @@ function Navbar() {
     <nav className="bg-blue-600 text-white shadow-lg">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
         <Link to="/" className="text-2xl font-bold">
-          ✈️ Aircraft Catalog
+          ✈️ AeroCatalog
         </Link>
 
         <div className="hidden md:flex space-x-6">
           <Link to="/" className="hover:text-blue-200">
             Home
           </Link>
+          <Link to="/help" className="hover:text-blue-200">
+            Help & Docs
+          </Link>
           <Link to="/catalog" className="hover:text-blue-200">
             Catalog
           </Link>
           {isAuthenticated ? (
             <>
-              <Link to="/admin/dashboard" className="hover:text-blue-200">
+              <Link to="/user/dashboard" className="hover:text-blue-200">
                 Dashboard
+              </Link>
+              <Link to="/chatbot" className="hover:text-blue-200">
+                Chatbot
               </Link>
               <button
                 onClick={handleLogout}
@@ -39,8 +45,8 @@ function Navbar() {
               </button>
             </>
           ) : (
-            <Link to="/admin/login" className="bg-green-500 px-4 py-2 rounded hover:bg-green-600">
-              Admin Login
+            <Link to="/login" className="bg-green-500 px-4 py-2 rounded hover:bg-green-600">
+              Login
             </Link>
           )}
         </div>
@@ -58,13 +64,19 @@ function Navbar() {
           <Link to="/" className="block hover:text-blue-200">
             Home
           </Link>
+          <Link to="/help" className="block hover:text-blue-200">
+            Help & Docs
+          </Link>
           <Link to="/catalog" className="block hover:text-blue-200">
             Catalog
           </Link>
           {isAuthenticated ? (
             <>
-              <Link to="/admin/dashboard" className="block hover:text-blue-200">
+              <Link to="/user/dashboard" className="block hover:text-blue-200">
                 Dashboard
+              </Link>
+              <Link to="/chatbot" className="block hover:text-blue-200">
+                Chatbot
               </Link>
               <button
                 onClick={handleLogout}
@@ -74,8 +86,8 @@ function Navbar() {
               </button>
             </>
           ) : (
-            <Link to="/admin/login" className="block bg-green-500 px-4 py-2 rounded hover:bg-green-600">
-              Admin Login
+            <Link to="/login" className="block bg-green-500 px-4 py-2 rounded hover:bg-green-600">
+              Login
             </Link>
           )}
         </div>

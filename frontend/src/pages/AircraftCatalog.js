@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { aircraftAPI, manufacturerAPI, categoryAPI } from '../api/client';
 import { FiSearch } from 'react-icons/fi';
@@ -14,7 +14,27 @@ function AircraftCatalog() {
   const [selectedManufacturer, setSelectedManufacturer] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
+  const searchTimeoutRef = useRef(null);
 
+  // Debounce search term
+  useEffect(() => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    searchTimeoutRef.current = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500); // Wait 500ms after user stops typing
+
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, [searchTerm]);
+
+  // Fetch data when filters or debounced search changes
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -23,7 +43,7 @@ function AircraftCatalog() {
           aircraftAPI.getAll({
             manufacturerId: selectedManufacturer || undefined,
             categoryId: selectedCategory || undefined,
-            search: searchTerm || undefined,
+            search: debouncedSearchTerm || undefined,
           }),
           manufacturerAPI.getAll(),
           categoryAPI.getAll(),
@@ -42,7 +62,7 @@ function AircraftCatalog() {
     };
 
     fetchData();
-  }, [selectedManufacturer, selectedCategory, searchTerm]);
+  }, [selectedManufacturer, selectedCategory, debouncedSearchTerm]);
 
   if (loading) {
     return (

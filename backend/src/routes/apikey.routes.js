@@ -25,6 +25,20 @@ router.post('/generate', verifyToken, async (req, res, next) => {
   try {
     const { name } = req.body;
 
+    // Check how many API keys user already has
+    const existingKeysCount = await ApiKey.count({
+      where: { userId: req.user.id, isActive: true },
+    });
+
+    if (existingKeysCount >= 10) {
+      return res.status(400).json({
+        success: false,
+        message: 'You have reached the maximum limit of 10 active API keys. Please revoke some keys first.',
+        currentCount: existingKeysCount,
+        maxLimit: 10,
+      });
+    }
+
     const newApiKey = ApiKey.generateKey();
 
     const apiKey = await ApiKey.create({
@@ -57,9 +71,13 @@ router.get('/', verifyToken, async (req, res, next) => {
       order: [['createdAt', 'DESC']],
     });
 
+    const activeCount = apiKeys.filter(k => k.isActive).length;
+
     res.status(200).json({
       success: true,
       count: apiKeys.length,
+      activeCount,
+      maxLimit: 10,
       data: apiKeys,
     });
   } catch (error) {

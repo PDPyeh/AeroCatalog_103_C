@@ -24,11 +24,13 @@ sequelize.sync({ alter: false }).catch((err) => {
 });
 
 // Routes
-app.use('/api/auth', require('./routes/auth.routes'));
+app.use('/api/admin/auth', require('./routes/admin.routes'));
+app.use('/api/users', require('./routes/user.routes'));
 app.use('/api/aircraft', require('./routes/aircraft.routes'));
 app.use('/api/manufacturers', require('./routes/manufacturer.routes'));
 app.use('/api/categories', require('./routes/category.routes'));
-app.use('/api/admin/api-keys', require('./routes/apikey.routes'));
+app.use('/api/api-keys', require('./routes/apikey.routes'));
+app.use('/api/chatbot', require('./routes/chatbot.routes'));
 
 // Health check
 app.get('/api/health', (req, res) => {

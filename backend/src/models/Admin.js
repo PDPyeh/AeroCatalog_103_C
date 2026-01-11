@@ -2,7 +2,7 @@ const { DataTypes } = require('sequelize');
 const { sequelize } = require('../config/database');
 const bcrypt = require('bcryptjs');
 
-const User = sequelize.define('User', {
+const Admin = sequelize.define('Admin', {
   id: {
     type: DataTypes.INTEGER,
     primaryKey: true,
@@ -24,13 +24,9 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  company: {
-    type: DataTypes.STRING,
-    allowNull: true,
-  },
-  website: {
-    type: DataTypes.STRING,
-    allowNull: true,
+  role: {
+    type: DataTypes.ENUM('admin'),
+    defaultValue: 'admin',
   },
   isActive: {
     type: DataTypes.BOOLEAN,
@@ -38,21 +34,21 @@ const User = sequelize.define('User', {
   },
 }, {
   timestamps: true,
-  tableName: 'end_users',
+  tableName: 'admins',
   hooks: {
-    beforeCreate: async (user) => {
-      if (user.password) {
+    beforeCreate: async (admin) => {
+      if (admin.password) {
         const salt = await bcrypt.genSalt(10);
-        user.password = await bcrypt.hash(user.password, salt);
+        admin.password = await bcrypt.hash(admin.password, salt);
       }
     },
   },
 });
 
-User.prototype.matchPassword = async function (enteredPassword) {
+Admin.prototype.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
-module.exports = User;
+module.exports = Admin;
 
 
